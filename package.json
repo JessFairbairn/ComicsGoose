@@ -1,0 +1,17 @@
+{
+  "name": "comic_goose",
+  "version": "0.1.0-alpha",
+  "description": "No more webcomic woes",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start"
+  },
+  "author": "Jess Fairbairn",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine-core": "^2.9.1",
+    "karma": "^2.0.0",
+    "karma-firefox-launcher":"1.1.0",
+    "karma-jasmine": "^1.1.1"
+  }
+}

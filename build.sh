@@ -1,0 +1,1 @@
+zip -r ComicsGoose.xpi manifest.json resources

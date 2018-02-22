@@ -1,0 +1,1 @@
+No more Web Comic bookmarking woes

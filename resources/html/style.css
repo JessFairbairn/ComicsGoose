@@ -1,0 +1,57 @@
+/*
+
+body {
+	background-color: #fff;
+	color: #2e3436;
+	font: normal 16px "Open Sans", Arial, sans-serif;
+	text-align: center;
+}
+
+div {
+	margin-top: 50px;
+}
+
+
+
+a {
+    color: #2ca089;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}*/
+
+
+/* Comics Manager CSS */
+body{
+	padding: 1em;
+}
+
+h1 {
+    font-size: 24px;
+	font-weight: 300;
+	margin:auto;
+	text-align: center;
+}
+
+.hidden-at-start {
+	display: none;
+}
+
+.instruction {
+	text-align: center;
+	margin-top: 1em;
+}
+
+.vertical-form input, .vertical-form button, .vertical-form select {
+	display: block;
+}
+
+#comics-list {
+	padding-left:0;
+}
+
+#comics-list li {
+	list-style: none;
+}

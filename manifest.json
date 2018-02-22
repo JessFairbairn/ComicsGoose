@@ -1,0 +1,43 @@
+{
+
+  "manifest_version": 2,
+  "name": "Comics Goose",
+  "version": "0.1",
+
+  "applications":{
+    "gecko": {
+      "id": "comicsgoose@furby.com"
+    }
+  },
+
+  "description": "No more webcomic bookmarking woes",
+  "icons": {
+    "32": "resources/icons/32.png"
+  },
+
+  "permissions": [
+    "activeTab",
+    "menus",
+    "storage",
+    "tabs"
+  ],
+
+  "background": {
+    "scripts": ["resources/js/background.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "resources/icons/32.png",
+    "default_title": "Comics Goose",
+    "default_popup": "resources/html/popup.html"
+  },
+
+
+  "sidebar_action": {
+    "default_icon": "resources/icons/32.png",
+    "default_title": "Comics Goose",
+    "default_panel": "resources/html/index.html",
+    "browser_style": true
+  }
+
+}
