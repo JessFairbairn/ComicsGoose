@@ -7,6 +7,10 @@ document.getElementById("mark-button").onclick = () => {
         reloadPages();
     });
 };
+document.getElementById('sidebar-button').onclick = () => {
+    browser.sidebarAction.open();
+}
+
 document.getElementById('comics-dropdown').onchange = comicListChange;
 
 loadComicList();

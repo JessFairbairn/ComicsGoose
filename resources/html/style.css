@@ -48,6 +48,14 @@ h1 {
 	display: block;
 }
 
+.vertical-form input, .vertical-form select {
+	width: 15em;
+}
+
+.vertical-form button {
+	/* margin: auto; */
+}
+
 #comics-list {
 	padding-left:0;
 }

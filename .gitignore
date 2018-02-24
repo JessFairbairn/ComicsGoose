@@ -1,0 +1,5 @@
+*.bat
+*.xpi
+
+node_modules/*
+.vscode/*

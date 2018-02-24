@@ -29,7 +29,9 @@
   "browser_action": {
     "default_icon": "resources/icons/32.png",
     "default_title": "Comics Goose",
-    "default_popup": "resources/html/popup.html"
+    "default_popup": "resources/html/popup.html",
+    "browser_style": true
+
   },
 
 
