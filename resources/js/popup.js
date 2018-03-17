@@ -1,5 +1,6 @@
 //Page Setup
 const storageService = new StorageService();
+const nameService = new NameService;
 
 document.getElementById("mark-button").onclick = () => {
     saveNewComic().then(() => {
@@ -12,6 +13,15 @@ document.getElementById('sidebar-button').onclick = () => {
 }
 
 document.getElementById('comics-dropdown').onchange = comicListChange;
+
+//load current page title
+let pageTitle;
+browser.tabs.query({ active: true, currentWindow: true }).then(
+    tabArray => {
+        pageTitle = tabArray[0].title;
+        document.getElementById('new-comic-name').value = nameService.generateComicName(pageTitle);
+    }
+);
 
 loadComicList();
 
