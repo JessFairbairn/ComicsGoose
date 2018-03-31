@@ -39,7 +39,6 @@ class StorageService {
     }
 
     deleteComic(title){
-
         
         if(!title){
             throw new Error('Arguments are empty')
@@ -71,4 +70,34 @@ class StorageService {
         );
         
     }
+
+    searchComicsByDomain(url){
+        let domain = extractHostname(url);
+
+        return browser.storage.local.get('comics').then(
+            results => results.comics.filter(comic => extractHostname(comic.url) === domain)
+        )
+    }
+    
+}
+
+function extractHostname(url) {
+    //shamelessly copy and pasted from https://stackoverflow.com/a/23945027/8737631
+
+    var hostname;
+    //find & remove protocol (http, ftp, etc.) and get hostname
+
+    if (url.indexOf("://") > -1) {
+        hostname = url.split('/')[2];
+    }
+    else {
+        hostname = url.split('/')[0];
+    }
+
+    //find & remove port number
+    hostname = hostname.split(':')[0];
+    //find & remove "?"
+    hostname = hostname.split('?')[0];
+
+    return hostname;
 }

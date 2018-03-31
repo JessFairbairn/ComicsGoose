@@ -5,7 +5,12 @@ describe("Storage Service",function(){
             if(key !== "comics"){
                 return new Promise(resolve => resolve({}));
             }
-            return new Promise(resolve => resolve({comics:[{title:'Example Comic', url:'example.com'}]}));
+            return new Promise(resolve => resolve(
+                {comics:[
+                    {title:'Example Comic', url:'example.com'},
+                    {title:'Another Comic', url:'example2.com'}
+                ]}
+            ));
         },
 
         set: function(obj){
@@ -13,8 +18,7 @@ describe("Storage Service",function(){
         }
     };
 
-    beforeEach(function(){
-        
+    beforeEach(function(){        
 
         browser = {storage:{local:storageMock}};
     })
@@ -34,7 +38,8 @@ describe("Storage Service",function(){
         storageService.saveComic("New Comic", "zombo.com").then(comics => {
             let expectedObj = {comics:[
                 {title:'Example Comic', url:'example.com'},
-                {title:'New Comic', url:'zombo.com'}
+                {title:'Another Comic', url:'example2.com'},
+                {title:'New Comic', url:'zombo.com'},
             ]};
             expect(setSpy).toHaveBeenCalledWith(expectedObj)
         });
@@ -47,7 +52,8 @@ describe("Storage Service",function(){
         let setSpy = spyOn(storageMock, 'set');
         storageService.saveComic("Example Comic", "example.com/comic2.html").then(comics => {
             let expectedObj = {comics:[
-                {title:'Example Comic', url:'example.com/comic2.html'}
+                {title:'Example Comic', url:'example.com/comic2.html'},
+                {title:'Another Comic', url:'example2.com'},
             ]};
             expect(setSpy).toHaveBeenCalledWith(expectedObj)
         });
@@ -59,7 +65,9 @@ describe("Storage Service",function(){
 
         let setSpy = spyOn(storageMock, 'set');
         storageService.deleteComic("Example Comic").then(comics => {
-            let expectedObj = {comics:[]};
+            let expectedObj = {comics:[
+                {title:'Another Comic', url:'example2.com'}
+            ]};
             expect(setSpy).toHaveBeenCalledWith(expectedObj)
         });
         
@@ -73,6 +81,26 @@ describe("Storage Service",function(){
         storageService.deleteComic('not a real comic').then(() => 
             fail('Didn\'t throw error')
         ).catch(done);        
+        
+    });
+
+    it("should return relevant comics when searching by url", () => {
+        const storageService = new StorageService();
+
+        
+        storageService.searchComicsByDomain('example.com/page1').then(found => {
+            expect(found).toContain({title:'Example Comic', url:'example.com'});
+            expect(found.length).toBe(1);
+        });
+        
+    });
+
+    it("should not return pages on a different subdomain", () => {
+        const storageService = new StorageService();
+        
+        storageService.searchComicsByDomain('other.example.com/page1').then(found => {
+            expect(found.length).toBe(0);
+        });
         
     });
 });

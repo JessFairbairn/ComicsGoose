@@ -26,20 +26,48 @@ browser.tabs.query({ active: true, currentWindow: true }).then(
 loadComicList();
 
 //Functions
+function getUrlOfOpenTab(){
+    const query = { active: true, currentWindow: true };
+
+    return browser.tabs.query(query).then(
+        tabArray => url = tabArray[0].url
+    );
+}
+
 function loadComicList() {
     const comicsDropdown = document.getElementById('comics-dropdown')
     comicsDropdown.innerHTML = null;
 
-    storageService.getComics().then(comics => {
-        if(!comics || !comics.length) {
+    getUrlOfOpenTab().then(url =>
+        Promise.all([storageService.getComics(), storageService.searchComicsByDomain(url)])
+    ).then(results => {
+        let comics = results[0];
+        let comicsOnDomain = results[1];
+
+        if(!comics.length || !comicsOnDomain.length) {
             document.getElementById('new-comic-name').style.display = 'initial';
-            comics = [];
         }
         else {
             document.getElementById('new-comic-name').style.display = 'none';
         }
 
+        if(comicsOnDomain.length){
+            let suggestedGroup = document.createElement("optgroup");
+            comicsDropdown.appendChild(suggestedGroup)
+
+            for(let comic of comicsOnDomain){
+                let option = document.createElement("option");
+                option.innerText = comic.title;
+                option.value = comic.title;
+                comicsDropdown.appendChild(option)
+            }
+        }
+
         for(let comic of comics){
+            if(comicsOnDomain.some(alreadyListed => alreadyListed.url === comic.url)){
+                continue;
+            }
+
             let option = document.createElement("option");
             option.innerText = comic.title;
             option.value = comic.title;
@@ -50,6 +78,10 @@ function loadComicList() {
         newComicOption.innerText = 'New Comic...';
         newComicOption.value = '';
         comicsDropdown.appendChild(newComicOption);
+
+        if(!comicsOnDomain.length){
+            newComicOption.selected = true;
+        }
     });
 }
 
@@ -70,11 +102,7 @@ function saveNewComic(){
         selected = document.getElementById('new-comic-name').value;
     }
 
-    var query = { active: true, currentWindow: true };
-
-    return browser.tabs.query(query).then(
-        tabArray => url = tabArray[0].url
-    ).then(
+    return getUrlOfOpenTab().then(
         url => storageService.saveComic(selected, url)
     ).catch(error => {
         alert("Error saving comic!");
