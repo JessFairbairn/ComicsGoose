@@ -1,7 +1,7 @@
 class StorageService {
     getComics(){
         return browser.storage.local.get('comics').then(
-            results => results.comics            
+            results => results.comics || []
         );
     }
 
@@ -75,7 +75,12 @@ class StorageService {
         let domain = extractHostname(url);
 
         return browser.storage.local.get('comics').then(
-            results => results.comics.filter(comic => extractHostname(comic.url) === domain)
+            results => {
+                if(!results.comics){
+                    return [];
+                }
+                return results.comics.filter(comic => extractHostname(comic.url) === domain);
+            }
         )
     }
     

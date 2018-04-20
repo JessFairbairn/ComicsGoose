@@ -30,7 +30,7 @@ function getUrlOfOpenTab(){
     const query = { active: true, currentWindow: true };
 
     return browser.tabs.query(query).then(
-        tabArray => url = tabArray[0].url
+        tabArray => tabArray[0].url
     );
 }
 
@@ -41,6 +41,7 @@ function loadComicList() {
     getUrlOfOpenTab().then(url =>
         Promise.all([storageService.getComics(), storageService.searchComicsByDomain(url)])
     ).then(results => {
+        console.debug(results)
         let comics = results[0];
         let comicsOnDomain = results[1];
 
