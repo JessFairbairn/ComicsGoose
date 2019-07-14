@@ -42,13 +42,14 @@ function deleteComic(event) {
 }
 
 function handleMessage(request, sender, sendResponse) {
-    console.log("Command received: " + request.command);
+    console.debug("Command received: " + request.command);
     switch(request.command){
         case "reload":
             loadComicList();
             sendResponse({response: "Response from background script"});
+            break;
         default:
-            console.warn("Sidebar didn't recognise command");
+            console.warn(`Sidebar didn't recognise command '${request.command}'`);
     }
   }
   

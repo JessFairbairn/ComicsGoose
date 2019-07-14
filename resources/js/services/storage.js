@@ -1,4 +1,5 @@
 class StorageService {
+
     getComics(){
         return browser.storage.local.get('comics').then(
             results => results.comics || []
@@ -20,22 +21,45 @@ class StorageService {
             }
 
             //check if this comic already exists
-            for(let i = 0; i < comics.length; i++){
+            for (let i = 0; i < comics.length; i++){
                 let comic = comics[i];
-                if(comic.title === title){
-                    comics[i] = newComic;
-                    return comics;
+                if (comic.title === title) {
+                    let bookmarkPromise;
+                    if (!comic.bookmark) {
+                        bookmarkPromise = browser.bookmarks.create(
+                            {url,
+                            title}
+                        )
+                    } else {
+                        bookmarkPromise = browser.bookmarks.get(
+                                comic.bookmark
+                            ).then(bookmark => browser.bookmarks.update(
+                                bookmark[0].id,
+                                {url, title}
+                                )
+                            )
+                    }
+
+                    return bookmarkPromise.then(bookmark => {
+                        comic.bookmark = bookmark.id;
+                        return comics
+                    })
                 }
             }
 
             //...and if it doesn't...
+            browser.bookmarks.create(
+                {url,
+                title}
+            ).then(
+                new_bookmark => newComic.bookmark = new_bookmark.id
+            )
             comics.push(newComic);            
-            return comics
+            return Promise.resolve(comics)
 
         }).then(comics => 
             browser.storage.local.set({comics})
-        );
-        
+        );        
     }
 
     deleteComic(title){

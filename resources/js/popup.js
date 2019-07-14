@@ -3,7 +3,7 @@ const storageService = new StorageService();
 const nameService = new NameService;
 
 document.getElementById("mark-button").onclick = () => {
-    saveNewComic().then(() => {
+    saveComicPosition().then(() => {
         loadComicList();
         reloadPages();
     });
@@ -96,19 +96,19 @@ function comicListChange(event){
     }
 }
 
-function saveNewComic(){
+function saveComicPosition(){
     let selected = document.getElementById('comics-dropdown').value;
 
     if(!selected){
         selected = document.getElementById('new-comic-name').value;
     }
 
-    return getUrlOfOpenTab().then(
-        url => storageService.saveComic(selected, url)
-    ).catch(error => {
-        alert("Error saving comic!");
-        console.log(error);
-    });
+    return getUrlOfOpenTab().then(url => storageService.saveComic(
+            selected, url
+        )).catch(error => {
+            alert("Error saving comic!");
+            console.error(error);
+        });
 }
 
 function reloadPages(e) {
