@@ -1,3 +1,5 @@
+@import url('dark-theme.css') (prefers-color-scheme: dark);
+
 /*
 
 body {
@@ -62,22 +64,4 @@ h1 {
 
 #comics-list li {
 	list-style: none;
-}
-
-@media (prefers-color-scheme: dark) {
-	* {
-		color: white;
-	}
-
-	html {
-		background-color: #38383d;
-	}
-
-	input, select {
-		background-color: #27272a;
-	}
-
-	button:not(.default) {
-		background-color: #4a4a4f;
-	}
 }

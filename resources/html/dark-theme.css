@@ -1,0 +1,15 @@
+*:not(a) {
+    color: white;
+}
+
+html {
+    background-color: #38383d;
+}
+
+input, select {
+    background-color: #27272a;
+}
+
+button:not(.default) {
+    background-color: #4a4a4f;
+}
