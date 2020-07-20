@@ -1,31 +1,9 @@
 @import url('dark-theme.css') (prefers-color-scheme: dark);
 
-/*
-
-body {
-	background-color: #fff;
-	color: #2e3436;
-	font: normal 16px "Open Sans", Arial, sans-serif;
-	text-align: center;
-}
-
-div {
-	margin-top: 50px;
-}
-
-
-
-a {
-    color: #2ca089;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}*/
-
-
 /* Comics Manager CSS */
+html {
+	height:100%;
+}
 body{
 	padding: 1em;
 }
