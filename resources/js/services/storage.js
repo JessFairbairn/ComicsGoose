@@ -164,3 +164,5 @@ function extractHostname(url) {
 
     return hostname;
 }
+
+export {StorageService};

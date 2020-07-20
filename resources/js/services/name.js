@@ -13,3 +13,5 @@ class NameService {
         return pageTitle.trim();
     }
 }
+
+export {NameService};
