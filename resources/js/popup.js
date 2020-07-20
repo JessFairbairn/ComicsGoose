@@ -41,7 +41,6 @@ function loadComicList() {
     getUrlOfOpenTab().then(url =>
         Promise.all([storageService.getComics(), storageService.searchComicsByDomain(url)])
     ).then(results => {
-        console.debug(results)
         let comics = results[0];
         let comicsOnDomain = results[1];
 
@@ -112,8 +111,7 @@ function saveComicPosition(){
 }
 
 function reloadPages(e) {
-    var sending = browser.runtime.sendMessage({
+    browser.runtime.sendMessage({
       command: "reload"
-    });
-    // sending.then(handleResponse, handleError);  
+    }).catch(error => console.debug(error));
 }

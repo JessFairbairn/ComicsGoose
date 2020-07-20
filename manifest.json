@@ -1,8 +1,7 @@
 {
-
   "manifest_version": 2,
   "name": "Comics Goose",
-  "version": "0.4",
+  "version": "0.4.1",
 
   "applications":{
     "gecko": {
@@ -12,13 +11,14 @@
 
   "description": "No more webcomic bookmarking woes",
   "icons": {
-    "32": "resources/icons/32.png"
+    "32": "resources/icons/goose.svg"
   },
 
   "permissions": [
     "activeTab",
     "bookmarks",
     "menus",
+    "notifications",
     "storage",
     "tabs"
   ],
@@ -28,18 +28,31 @@
   },
 
   "browser_action": {
-    "default_icon": "resources/icons/32.png",
+    "default_icon": "resources/icons/goose_small_light.svg",
+    "theme_icons": [{
+      "light": "resources/icons/goose_small_light.svg",
+      "dark": "resources/icons/goose_small_dark.svg",
+      "size": 16
+    }, {
+      "light": "resources/icons/goose_small_light.svg",
+      "dark": "resources/icons/goose_small_dark.svg",
+      "size": 32
+    }],
     "default_title": "Comics Goose",
     "default_popup": "resources/html/popup.html",
     "browser_style": true
-
   },
 
 
   "sidebar_action": {
-    "default_icon": "resources/icons/32.png",
+    "default_icon": "resources/icons/goose_small_light.svg",
     "default_title": "Comics Goose",
     "default_panel": "resources/html/index.html",
+    "browser_style": true
+  },
+
+  "options_ui": {
+    "page": "resources/html/options.html",
     "browser_style": true
   }
 

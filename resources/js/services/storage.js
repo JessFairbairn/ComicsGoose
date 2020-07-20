@@ -2,7 +2,11 @@ class StorageService {
 
     getComics(){
         return browser.storage.local.get('comics').then(
-            results => results.comics || []
+            results => results.comics || [],
+            error => {
+                console.error(error);
+                throw error;
+            }
         );
     }
 
@@ -11,54 +15,80 @@ class StorageService {
             throw new Error('Arguments are empty')
         }
 
-        return browser.storage.local.get('comics').then(
-            results => results.comics
-        ).then(comics =>{
+        return this.getComics().then(comics => {
             let newComic = {title, url};
-
-            if(!comics){
-                comics = [];
-            }
 
             //check if this comic already exists
             for (let i = 0; i < comics.length; i++){
                 let comic = comics[i];
                 if (comic.title === title) {
-                    let bookmarkPromise;
-                    if (!comic.bookmark) {
-                        bookmarkPromise = browser.bookmarks.create(
-                            {url,
-                            title}
-                        )
-                    } else {
-                        bookmarkPromise = browser.bookmarks.get(
-                                comic.bookmark
-                            ).then(bookmark => browser.bookmarks.update(
-                                bookmark[0].id,
-                                {url, title}
-                                )
-                            )
-                    }
+                    return this.getBookmarkSetting().then(saveBookmarks => {
+                        if (!saveBookmarks) {
+                            return;
+                        }
 
-                    return bookmarkPromise.then(bookmark => {
-                        comic.bookmark = bookmark.id;
-                        return comics
-                    })
+                        // Check if a bookmark has been saved
+                        if (!comic.bookmark) {
+                            return browser.bookmarks.create(
+                                {url,
+                                title}
+                            )
+                        } else {
+                            return browser.bookmarks.get(
+                                    comic.bookmark
+                                ).then(bookmark => browser.bookmarks.update(
+                                    bookmark[0].id,
+                                    {url, title}
+                                    ),
+                                    error => {
+                                        // Bookmark has been deleted, create new one
+                                        console.debug('Tried to update bookmark but couldnzt retrieve, creating new one:' + error)
+                                        browser.bookmarks.create(
+                                            {url,
+                                            title}
+                                        );
+                                    }
+                                ).catch(error => {
+                                    console.error('Error updating bookmark', error);
+                                })
+                        }
+                    
+                    }).then(bookmark => {
+                        if (bookmark) {
+                            comic.bookmark = bookmark.id;
+                        }
+                        comic.url = url;
+                        comics[i] = comic;
+                        return comics;
+                    });
                 }
             }
 
             //...and if it doesn't...
-            browser.bookmarks.create(
-                {url,
-                title}
-            ).then(
-                new_bookmark => newComic.bookmark = new_bookmark.id
-            )
-            comics.push(newComic);            
-            return Promise.resolve(comics)
+            return this.getBookmarkSetting().then(saveBookmarks => {
+                if(saveBookmarks) {
+                    return browser.bookmarks.create(
+                        {url,
+                        title}
+                    ).then(new_bookmark => {
+                        newComic.bookmark = new_bookmark.id;
+                        return newComic;
+                    });
+                } else {
+                    return newComic;
+                }
+            }).then(newComic => {
+                console.debug(comics);
+                comics.push(newComic);            
+                return comics;
+            });
 
-        }).then(comics => 
+        }).then(comics => {
+            if (!comics) {
+                throw new Error("Tried to save blank comics array");
+            }
             browser.storage.local.set({comics})
+        }
         );        
     }
 
@@ -68,10 +98,7 @@ class StorageService {
             throw new Error('Arguments are empty')
         }
 
-        return browser.storage.local.get('comics').then(
-            results => results.comics
-        ).then(comics => {
-
+        return this.getComics().then(comics => {
 
             if(!comics || !comics.length){
                 throw new Error(`Tried to delete comic ${title} but no comics stored at all!`);
@@ -98,16 +125,23 @@ class StorageService {
     searchComicsByDomain(url){
         let domain = extractHostname(url);
 
-        return browser.storage.local.get('comics').then(
-            results => {
-                if(!results.comics){
-                    return [];
-                }
-                return results.comics.filter(comic => extractHostname(comic.url) === domain);
+        return this.getComics().then(
+            comics => {
+                return comics.filter(comic => extractHostname(comic.url) === domain);
             }
         )
     }
-    
+
+    getBookmarkSetting() {
+        return browser.storage.local.get('save_bookmarks').then(
+            results => results.save_bookmarks,
+            error => {
+                browser.storage.local.set({'save_bookmarks': true});
+                console.log('Bookmark setting missing, defaulting to true');
+            }
+        );
+    }
+
 }
 
 function extractHostname(url) {
