@@ -1,14 +1,23 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8"/>
     <link rel="stylesheet" href="style.css"/>
+    <style>
+      label {
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body class="browser-style">
     <form>
-      <label>
+      <fieldset>
         <input type="checkbox" name="bookmarks" id="save-bookmarks-checkbox" class="browser-style"/>
-        Save bookmarks for comics
-      </label>
+        <label for="save-bookmarks-checkbox">
+          Save bookmarks for comics
+        </label>
+        <div id="save-bookmarks-description">A browser bookmark will be created and kept up-to-date with your current position in the series</span>
+      </fieldset>
     </form>
   </body>
 	<script src="../js/options.js"></script> 

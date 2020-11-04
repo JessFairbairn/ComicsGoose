@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Comics Goose",
-  "version": "0.4.1",
+  "version": "0.4.2",
 
   "applications":{
     "gecko": {
@@ -16,11 +16,14 @@
 
   "permissions": [
     "activeTab",
-    "bookmarks",
     "menus",
     "notifications",
     "storage",
     "tabs"
+  ],
+
+  "optional_permissions": [
+    "bookmarks"
   ],
 
   "background": {

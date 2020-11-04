@@ -14,5 +14,15 @@ browser.storage.local.get('save_bookmarks').then(results => {
 function bookmarks_toggle_callback(event) {
     const checked = event.target.checked;
     console.debug('Setting "save bookmark" setting to ' + checked);
-    browser.storage.local.set({'save_bookmarks': checked});
+
+    browser.permissions.request({
+        permissions: ['bookmarks']
+    }).then(response =>{
+        if (response){
+            browser.storage.local.set({'save_bookmarks': checked});
+        } else {
+            console.warn('User declined bookmark permission');
+            event.target.checked = false;
+        }
+    });
 }

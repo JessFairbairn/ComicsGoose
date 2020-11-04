@@ -24,15 +24,26 @@ function onInstalledActions(details) {
     case 'install':
         console.log('New User installed the extension.')
 
+        browser.notifications.create('onInstalled', {
+          title: `Comics Goose Installed!`,
+          message: `Click here to see options.`,
+          type: 'basic'
+        });
+
+        browser.notifications.onClicked.addListener(() => {
+          browser.notifications.clear('onInstalled');
+          browser.runtime.openOptionsPage();
+        });
+
         // Set default settings
-        browser.storage.local.set({'save_bookmarks': true});
+        
         break;
 
     case 'update':
         console.log('User has updated their extension.');
         
         if (previousVersion < 0.4){
-          browser.notifications.create('onInstalled', {
+          browser.notifications.create('onUpdated', {
             title: `Comics Goose Updated: ${previousVersionText} - ${currentVersionText}`,
             message: `New features available, click here to see options.`,
             type: 'basic',
@@ -40,7 +51,7 @@ function onInstalledActions(details) {
           });
         }
         browser.notifications.onClicked.addListener(() => {
-          browser.notifications.clear('onInstalled');
+          browser.notifications.clear('onUpdated');
           browser.runtime.openOptionsPage();
         });
         
@@ -59,6 +70,9 @@ function onInstalledActions(details) {
 browser.runtime.onInstalled.addListener(onInstalledActions);
 
 function getMinorReleaseNumber(version_string) {
+  if (!version_string){
+    return null;
+  }
   const digits = version_string.split('.');
   const decimalDigits = digits.slice(1, version_string.length).join('');
   return Number(digits[0] + '.' + decimalDigits);
