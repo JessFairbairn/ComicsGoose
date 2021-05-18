@@ -1,6 +1,6 @@
 {
   "name": "comic_goose",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "No more webcomic woes",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "karma-jasmine": "^3.3.1"
   },
   "dependencies": {
-    "package.json": "^2.0.1"
+    "package.json": "^2.0.1",
+    "web-ext": "^5.4.1"
   }
 }
