@@ -14,6 +14,6 @@
     "karma": "^6.4.1",
     "karma-firefox-launcher": "^2.1.2",
     "karma-jasmine": "^5.1.0",
-    "web-ext": "^5.4.1"
+    "web-ext": "^7.6.2"
   }
 }
