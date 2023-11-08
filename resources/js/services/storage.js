@@ -1,4 +1,4 @@
-class StorageService {
+export default class StorageService {
 
     getComics(){
         return browser.storage.local.get('comics').then(
@@ -164,5 +164,3 @@ function extractHostname(url) {
 
     return hostname;
 }
-
-export {StorageService};

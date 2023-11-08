@@ -1,5 +1,5 @@
 //Page Setup
-import {StorageService} from './services/storage.js'
+import StorageService from './services/storage.js'
 const storageService = new StorageService();
 
 document.getElementById("delete-button").onclick = deleteComic;

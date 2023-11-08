@@ -1,6 +1,6 @@
 {
   "name": "comic_goose",
-  "version": "0.4.4",
+  "version": "0.4.3",
   "description": "No more webcomic woes",
   "main": "index.js",
   "scripts": {

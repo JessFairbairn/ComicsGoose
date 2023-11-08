@@ -1,4 +1,4 @@
-class NameService {
+export default class NameService {
     
 
     generateComicName(pageTitle){
@@ -13,5 +13,3 @@ class NameService {
         return pageTitle.trim();
     }
 }
-
-export {NameService};

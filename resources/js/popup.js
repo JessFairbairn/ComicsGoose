@@ -1,6 +1,6 @@
 //Page Setup
-import {NameService} from './services/name.js';
-import {StorageService} from './services/storage.js';
+import NameService from './services/name.js';
+import StorageService from './services/storage.js';
 const storageService = new StorageService();
 const nameService = new NameService;
 
