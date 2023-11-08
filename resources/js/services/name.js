@@ -1,8 +1,8 @@
-class NameService {
+export default class NameService {
     
 
     generateComicName(pageTitle){
-        const splitTokens = ['»', '-'];
+        const splitTokens = ['»', '-', ':'];
 
         for (let token of splitTokens){
             if(pageTitle.indexOf(token) > 0){
@@ -13,5 +13,3 @@ class NameService {
         return pageTitle.trim();
     }
 }
-
-export {NameService};

@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach",
+            "type": "firefox",
+            "request": "attach"
+        },
+        {
+            "name": "Launch WebExtension",
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "addonPath": "${workspaceFolder}",
+            "firefoxArgs": [
+                "https://xkcd.com",
+                "https://example.com",
+            ],
+            "log": {
+                "consoleLevel": {
+                    "default": "Warn"
+                }
+            }
+            
+        },
+        {
+            "name": "Main Profile",
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "addonPath": "${workspaceFolder}",
+            "profile": "default-esr",
+            "firefoxArgs": [
+                "https://xkcd.com",
+                "https://example.com",
+            ]
+        },
+    ]
+}

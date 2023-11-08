@@ -1,3 +1,4 @@
+import StorageService from "../../resources/js/services/storage.js";
 
 describe("Storage Service",function(){
     let storageMock = {
@@ -43,9 +44,9 @@ describe("Storage Service",function(){
 
     beforeEach(function(){        
 
-        browser = {
-            storage:{local:storageMock},
-            bookmarks:bookmarksMock,
+        window.browser = {
+            storage: {local: storageMock},
+            bookmarks: bookmarksMock
         };
     })
 
@@ -156,7 +157,7 @@ describe("Storage Service",function(){
         
     });
 
-    it("should throw an error when 'deleteComic' is called with non-existant title", done => {
+    it("should throw an error when 'deleteComic' is called with non-existent title", done => {
         const storageService = new StorageService();
         
         storageService.deleteComic('not a real comic').then(() => 
