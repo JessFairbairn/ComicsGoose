@@ -1,7 +1,8 @@
-import StorageService from "../../resources/js/services/storage.js";
+import StorageService from "../resources/js/services/storage.js";
 
-describe("Storage Service",function(){
-    let storageMock = {
+
+describe("Storage Service", function(){
+    const storageMock = {
         get: function(key) {
             if(key === "comics") {
                 return new Promise(resolve => resolve(
@@ -10,26 +11,28 @@ describe("Storage Service",function(){
                         {title:'Another Comic', url:'example2.com'}
                     ]}
                 ));
-            } else if (key === "bookmarks") {
-                return Promise.resolve(true);
+            } else if (key === "save_bookmarks") {
+                return Promise.resolve({save_bookmarks: true});
+            } else if (key === "use_sync") {
+                return Promise.resolve({use_sync: false});
             } else {
                 return new Promise(resolve => resolve({}));
             } 
         },
-
+    
         set: function(obj){
-
+    
         }
     };
-
-    let bookmarksMock = {
+    
+    const bookmarksMock = {
         get: function(bookmarkId) {
             return new Promise(resolve => resolve(
                 [{id: 1}]
             ));
         },
         create:function(newBookmark){
-
+    
             return new Promise(resolve => resolve(
             {id: 1}
             ));
@@ -41,13 +44,19 @@ describe("Storage Service",function(){
             ));
         }
     };
+    
 
     beforeEach(function(){        
-
-        window.browser = {
+        
+        
+        if (typeof window === "undefined") {
+            var window = {};
+        }
+        global.browser = {
             storage: {local: storageMock},
             bookmarks: bookmarksMock
         };
+        
     })
 
     it("should retrieve all values when 'getComics' called", () => {
@@ -101,12 +110,17 @@ describe("Storage Service",function(){
         );
 
         browser.storage.local.get = function(key){
-            return new Promise(resolve => resolve(
-                {comics:[
-                    {title:'Example Comic', url:'example.com', bookmark: 1},
-                    {title:'Another Comic', url:'example2.com', bookmark: 2}
-                ]}
-            ));
+            if (key === "save_bookmarks"){
+                return Promise.resolve({"save_bookmarks": true});
+            }
+            else{
+                return new Promise(resolve => resolve(
+                    {comics:[
+                        {title:'Example Comic', url:'example.com', bookmark: 1},
+                        {title:'Another Comic', url:'example2.com', bookmark: 2}
+                    ]}
+                ))
+            };
         }
 
         storageService.saveComic("Example Comic", "example.com/comic2.html").then(comics => {
@@ -121,12 +135,13 @@ describe("Storage Service",function(){
             "but no bookmark exists yet", done => {
         const storageService = new StorageService();
 
-        let storageGetSpy = spyOn(storageMock, 'get').and.returnValue(
+        let storageGetSpy = spyOn(storageMock, 'get').withArgs('comics').and.returnValue(
             Promise.resolve({comics:[
                 {title:'Example Comic', url:'example.com'},
                 {title:'Another Comic', url:'example2.com'}
             ]})
-        );
+        ).withArgs("save_bookmarks").and.returnValue(Promise.resolve({save_bookmarks:true}))
+        .withArgs("use_sync").and.returnValue(Promise.resolve({use_sync:false}));
 
         let bookmarkGetSpy = spyOn(bookmarksMock, 'get');
         let bookmarkCreateSpy = spyOn(bookmarksMock, 'create').and.returnValue(

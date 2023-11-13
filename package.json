@@ -3,14 +3,16 @@
   "version": "0.4.3",
   "description": "No more webcomic woes",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "karma start"
+    "test": "npx jasmine-browser-runner runSpecs"
   },
   "private": true,
   "author": "Jess Fairbairn",
   "license": "ISC",
   "devDependencies": {
-    "jasmine-core": "^4.5.0",
+    "jasmine-browser-runner": "^2.3.0",
+    "jasmine-core": "^5.1.1",
     "karma": "^6.4.1",
     "karma-firefox-launcher": "^2.1.2",
     "karma-jasmine": "^5.1.0",

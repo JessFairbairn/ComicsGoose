@@ -1,7 +1,16 @@
 export default class StorageService {
 
-    getComics(){
-        return browser.storage.local.get('comics').then(
+    async _getStorage() {
+        let useSync = await this.getSyncSetting();
+        if(useSync){
+            return browser.storage.sync;
+        } else {
+            return browser.storage.local;
+        }
+    }
+
+    async getComics(){
+        return (await this._getStorage()).get('comics').then(
             results => results.comics || [],
             error => {
                 console.error(error);
@@ -83,11 +92,11 @@ export default class StorageService {
                 return comics;
             });
 
-        }).then(comics => {
+        }).then(async comics => {
             if (!comics) {
                 throw new Error("Tried to save blank comics array");
             }
-            browser.storage.local.set({comics})
+            (await this._getStorage()).set({comics})
         }
         );        
     }
@@ -105,9 +114,9 @@ export default class StorageService {
             }
 
             //check if this comic already exists
-            for(let i = 0; i < comics.length; i++){
+            for (let i = 0; i < comics.length; i++) {
                 let comic = comics[i];
-                if(comic.title === title){
+                if (comic.title === title) {
                     comics.splice(i, 1);;
                     return comics;
                 }
@@ -116,8 +125,8 @@ export default class StorageService {
             //...and if it doesn't...
             throw new Error(`Tried to delete comic ${title} but no comic with that name!`);
 
-        }).then(comics => 
-            browser.storage.local.set({comics})
+        }).then(async comics => 
+            (await this._getStorage()).set({comics})
         );
         
     }
@@ -136,7 +145,17 @@ export default class StorageService {
         return browser.storage.local.get('save_bookmarks').then(
             results => results.save_bookmarks,
             error => {
-                browser.storage.local.set({'save_bookmarks': true});
+                browser.storage.local.set({'save_bookmarks': false});
+                console.log('Bookmark setting missing, defaulting to false');
+            }
+        );
+    }
+
+    getSyncSetting() {
+        return browser.storage.local.get('use_sync').then(
+            results => results.use_sync,
+            error => {
+                browser.storage.local.set({'use_sync': true});
                 console.log('Bookmark setting missing, defaulting to true');
             }
         );
