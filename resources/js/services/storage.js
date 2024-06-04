@@ -1,7 +1,7 @@
 export default class StorageService {
 
     getComics(){
-        return browser.storage.local.get('comics').then(
+        return browser.storage.sync.get('comics').then(
             results => results.comics || [],
             error => {
                 console.error(error);
@@ -87,7 +87,7 @@ export default class StorageService {
             if (!comics) {
                 throw new Error("Tried to save blank comics array");
             }
-            browser.storage.local.set({comics})
+            browser.storage.sync.set({comics})
         }
         );        
     }
@@ -117,7 +117,7 @@ export default class StorageService {
             throw new Error(`Tried to delete comic ${title} but no comic with that name!`);
 
         }).then(comics => 
-            browser.storage.local.set({comics})
+            browser.storage.sync.set({comics})
         );
         
     }
@@ -133,10 +133,10 @@ export default class StorageService {
     }
 
     getBookmarkSetting() {
-        return browser.storage.local.get('save_bookmarks').then(
+        return browser.storage.sync.get('save_bookmarks').then(
             results => results.save_bookmarks,
             error => {
-                browser.storage.local.set({'save_bookmarks': true});
+                browser.storage.sync.set({'save_bookmarks': true});
                 console.log('Bookmark setting missing, defaulting to true');
             }
         );
