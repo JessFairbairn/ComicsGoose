@@ -56,4 +56,5 @@ function handleMessage(request, sender, sendResponse) {
   
   browser.runtime.onMessage.addListener(handleMessage);
 
+// Update the comics list on a firefox sync.
 browser.storage.sync.onChanged.addListener(changes => loadComicList());
