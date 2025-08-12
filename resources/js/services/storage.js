@@ -19,13 +19,13 @@ export default class StorageService {
         );
     }
 
-    saveComic(title, url){
+    async saveComic(title, url){
         if(!title || !url){
             throw new Error('Arguments are empty')
         }
 
         return this.getComics().then(comics => {
-            let newComic = {title, url};
+            let newComic = {title, url, uuid: crypto.randomUUID()};
 
             //check if this comic already exists
             for (let i = 0; i < comics.length; i++){
@@ -51,7 +51,7 @@ export default class StorageService {
                                     ),
                                     error => {
                                         // Bookmark has been deleted, create new one
-                                        console.debug('Tried to update bookmark but couldnzt retrieve, creating new one:' + error)
+                                        console.debug('Tried to update bookmark but couldn\'t retrieve, creating new one:' + error)
                                         browser.bookmarks.create(
                                             {url,
                                             title}
@@ -96,7 +96,8 @@ export default class StorageService {
             if (!comics) {
                 throw new Error("Tried to save blank comics array");
             }
-            (await this._getStorage()).set({comics})
+            const browserStorage = await this._getStorage();
+            browserStorage.set({comics})
         }
         );        
     }
@@ -143,7 +144,7 @@ export default class StorageService {
 
     getBookmarkSetting() {
         return browser.storage.local.get('save_bookmarks').then(
-            results => results.save_bookmarks,
+            results => !!results.save_bookmarks,
             error => {
                 browser.storage.local.set({'save_bookmarks': false});
                 console.log('Bookmark setting missing, defaulting to false');
@@ -161,6 +162,52 @@ export default class StorageService {
         );
     }
 
+    async doesSyncHasData() {
+        let currentData = await browser.storage.sync.get("comics");
+        return (!!currentData.comics)
+    }
+
+    async copyLocalToSyncStorage() {
+        let results = await browser.storage.local.get("comics")
+        let localData = results["comics"];
+        await browser.storage.sync.set({"comics": localData});
+    }
+
+    async mergeLocalIntoSync() {
+        let localComics = (await browser.storage.local.get("comics"))["comics"];
+        let syncComics = (await browser.storage.sync.get("comics"))["comics"];
+        let newDict = mergeDictionaries(localComics, syncComics)
+
+        await browser.storage.sync.set("comics", newDict);
+    }
+
+    async addMissingUUIDs() {
+        let oldComics = await browser.storage.local.get("comics");
+        for (let comic of oldComics["comics"]) {
+            if (comic.uuid) {
+                continue;
+            }
+
+            comic.uuid = crypto.randomUUID();
+        }
+
+        await browser.storage.local.set("comics", oldComics);
+    }
+
+}
+
+function mergeDictionaries(newData, existingData) {
+    for (let newComic of newData) {
+        let existingComics = existingData.filter(savedComic => savedComic.uuid === newComic.uuid);
+        if (existingComics.length) {
+            // TODO: sort this properly
+            console.warn("Possible clash UNIMPLEMENTED")
+        }
+
+        existingData.push(newComic);
+
+    }
+    return existingData;
 }
 
 function extractHostname(url) {

@@ -36,6 +36,7 @@
             "firefoxArgs": [
                 "https://xkcd.com",
                 "https://example.com",
+                "about:debugging#/runtime/this-firefox"
             ]
         },
     ]
