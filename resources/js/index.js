@@ -55,3 +55,5 @@ function handleMessage(request, sender, sendResponse) {
   }
   
   browser.runtime.onMessage.addListener(handleMessage);
+
+browser.storage.sync.onChanged.addListener(changes => loadComicList());
