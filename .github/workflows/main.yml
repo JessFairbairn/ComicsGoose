@@ -1,0 +1,31 @@
+name: Run Jasmine Browser Tests
+
+on:
+  push:
+    branches: [main, sync]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firefox dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libdbus-glib-1-2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jasmine Browser Tests
+        run: npx jasmine-browser-runner runSpecs
