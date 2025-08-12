@@ -15,7 +15,9 @@
     "stopOnSpecFailure": false,
     "random": true
   },
+  "listenAddress": "localhost",
+  "hostname": "localhost",
   "browser": {
-    "name": "firefox"
+    "name": "headlessFirefox"
   }
 }
