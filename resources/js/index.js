@@ -15,6 +15,8 @@ function loadComicList(){
             return;
         }
 
+        document.getElementById('no-comics-message').style.display = 'none';            
+
         for(let comic of comics){
             let listItem = document.createElement("li");
             let radioButton = document.createElement("input");
