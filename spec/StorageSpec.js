@@ -53,12 +53,15 @@ describe("Storage Service", function(){
         if (typeof window === "undefined") {
             var window = {};
         }
-        global.browser = {
+        globalThis.browser = {
             storage: {local: new StorageMock(), sync: new StorageMock()},
             bookmarks: bookmarksMock
         };
         
-        global.crypto = {randomUUID: () => "fakeId"}
+        Object.defineProperty(globalThis, "crypto", {
+            value: { randomUUID: () => "fakeId" },
+            configurable: true
+        });
     });
 
     it("should retrieve all values when 'getComics' called", () => {
@@ -71,7 +74,6 @@ describe("Storage Service", function(){
 
     it("should add a value when 'saveComic' called with new title", async () => {
         const storageService = new StorageService();
-        global.crypto = {randomUUID: () => 'fakeId'};
 
         let setSpy = spyOn(browser.storage.local, 'set');
         await storageService.saveComic("New Comic", "zombo.com").then(async () => {
@@ -88,7 +90,7 @@ describe("Storage Service", function(){
 
     it("should replace a value when 'saveComic' called with existing title", async () => {
         const storageService = new StorageService();
-        global.crypto = {randomUUID: () => 'fakeId'};
+        
         let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
             comics:[
                 {
@@ -204,7 +206,6 @@ describe("Storage Service", function(){
 
     it("adds missing UUIDs on upgrade", async () => {
         const storageService = new StorageService();
-        global.crypto = {randomUUID: () => 'fakeId'};
         let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
             comics:[
                 {
