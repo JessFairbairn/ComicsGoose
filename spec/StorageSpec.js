@@ -1,4 +1,5 @@
-import StorageService from "../../resources/js/services/storage.js";
+import StorageService from "../resources/js/services/storage.js";
+
 
 describe("Storage Service",function(){
     let storageMock = {
@@ -16,12 +17,12 @@ describe("Storage Service",function(){
                 return new Promise(resolve => resolve({}));
             } 
         },
-
+    
         set: function(obj){
-
+    
         }
     };
-
+    
     let bookmarksMock = {
         get: function(bookmarkId) {
             return new Promise(resolve => resolve(
@@ -29,7 +30,7 @@ describe("Storage Service",function(){
             ));
         },
         create:function(newBookmark){
-
+    
             return new Promise(resolve => resolve(
             {id: 1}
             ));
@@ -43,7 +44,7 @@ describe("Storage Service",function(){
     };
 
     beforeEach(function(){        
-
+        
         window.browser = {
             storage: {local: storageMock},
             bookmarks: bookmarksMock
@@ -101,11 +102,11 @@ describe("Storage Service",function(){
         );
 
         browser.storage.local.get = function(key){
-            return new Promise(resolve => resolve(
-                {comics:[
-                    {title:'Example Comic', url:'example.com', bookmark: 1},
-                    {title:'Another Comic', url:'example2.com', bookmark: 2}
-                ]}
+                return new Promise(resolve => resolve(
+                    {comics:[
+                        {title:'Example Comic', url:'example.com', bookmark: 1},
+                        {title:'Another Comic', url:'example2.com', bookmark: 2}
+                    ]}
             ));
         }
 
