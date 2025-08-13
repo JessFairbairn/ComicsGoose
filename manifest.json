@@ -27,7 +27,8 @@
   ],
 
   "background": {
-    "scripts": ["resources/js/background.js"]
+    "scripts": ["resources/js/background.js"],
+    "type": "module"
   },
 
   "browser_action": {

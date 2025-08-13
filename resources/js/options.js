@@ -1,3 +1,5 @@
+import StorageService from "./services/storage.js";
+
 //Page Setup
 // const storageService = new StorageService();
 browser.storage.local.get('save_bookmarks').then(results => {
@@ -11,7 +13,7 @@ browser.storage.local.get('save_bookmarks').then(results => {
 
 
 
-function bookmarks_toggle_callback(event) {
+export function bookmarks_toggle_callback(event) {
     const checked = event.target.checked;
     console.debug('Setting "save bookmark" setting to ' + checked);
 

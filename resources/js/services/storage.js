@@ -42,7 +42,7 @@ export default class StorageService {
                                     ),
                                     error => {
                                         // Bookmark has been deleted, create new one
-                                        console.debug('Tried to update bookmark but couldnzt retrieve, creating new one:' + error)
+                                        console.debug('Tried to update bookmark but couldn\'t retrieve, creating new one:' + error)
                                         browser.bookmarks.create(
                                             {url,
                                             title}
@@ -134,7 +134,7 @@ export default class StorageService {
 
     getBookmarkSetting() {
         return browser.storage.local.get('save_bookmarks').then(
-            results => results.save_bookmarks,
+            results => !!results.save_bookmarks,
             error => {
                 browser.storage.local.set({'save_bookmarks': true});
                 console.log('Bookmark setting missing, defaulting to true');
