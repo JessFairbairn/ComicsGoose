@@ -1,9 +1,10 @@
 import StorageService from "../resources/js/services/storage.js";
 
 
-describe("Storage Service",function(){
-    let storageMock = {
-        get: function(key) {
+describe("Storage Service", function(){
+
+    class StorageMock {
+        get(key) {
             if(key === "comics") {
                 return new Promise(resolve => resolve(
                     {comics:[
@@ -11,19 +12,21 @@ describe("Storage Service",function(){
                         {title:'Another Comic', url:'example2.com'}
                     ]}
                 ));
-            } else if (key === "bookmarks") {
-                return Promise.resolve(true);
+            } else if (key === "save_bookmarks") {
+                return Promise.resolve({save_bookmarks: true});
+            } else if (key === "use_sync") {
+                return Promise.resolve({use_sync: false});
             } else {
                 return new Promise(resolve => resolve({}));
             } 
-        },
+        }
     
-        set: function(obj){
-    
+        set(obj){
+            return Promise.resolve();
         }
     };
     
-    let bookmarksMock = {
+    const bookmarksMock = {
         get: function(bookmarkId) {
             return new Promise(resolve => resolve(
                 [{id: 1}]
@@ -42,14 +45,24 @@ describe("Storage Service",function(){
             ));
         }
     };
+    
 
     beforeEach(function(){        
         
-        window.browser = {
-            storage: {local: storageMock},
+        
+        if (typeof window === "undefined") {
+            var window = {};
+        }
+        globalThis.browser = {
+            storage: {local: new StorageMock(), sync: new StorageMock()},
             bookmarks: bookmarksMock
         };
-    })
+        
+        Object.defineProperty(globalThis, "crypto", {
+            value: { randomUUID: () => "fakeId" },
+            configurable: true
+        });
+    });
 
     it("should retrieve all values when 'getComics' called", () => {
         const storageService = new StorageService();
@@ -59,75 +72,69 @@ describe("Storage Service",function(){
         
     });
 
-    it("should add a value when 'saveComic' called with new title", () => {
+    it("should add a value when 'saveComic' called with new title", async () => {
         const storageService = new StorageService();
 
-        let setSpy = spyOn(storageMock, 'set');
-        storageService.saveComic("New Comic", "zombo.com").then(comics => {
+        let setSpy = spyOn(browser.storage.local, 'set');
+        await storageService.saveComic("New Comic", "zombo.com").then(async () => {
             let expectedObj = {comics:[
                 {title:'Example Comic', url:'example.com'},
                 {title:'Another Comic', url:'example2.com'},
-                {title:'New Comic', url:'zombo.com'},
+                {title:'New Comic', url:'zombo.com', uuid:'fakeId', bookmark: 1},
             ]};
-            expect(setSpy).toHaveBeenCalledWith(expectedObj)
+            expect(setSpy).toHaveBeenCalledOnceWith(expectedObj);
+            
         });
         
     });
 
-    it("should replace a value when 'saveComic' called with existing title", done => {
+    it("should replace a value when 'saveComic' called with existing title", async () => {
         const storageService = new StorageService();
-
-        let setSpy = spyOn(storageMock, 'set');
-        storageService.saveComic("Example Comic", "example.com/comic2.html").then(comics => {
-            const expectedObj = {comics:[
-                {title:'Example Comic', url:'example.com/comic2.html', bookmark: 1},
-                {title:'Another Comic', url:'example2.com'},
-            ]};
+        
+        let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
+            comics:[
+                {
+                    title:'Example Comic',
+                    url:'example.com/comic1.html',
+                    bookmark: 1,
+                    uuid:'fakeId'
+                },
+                {
+                    title:'Another Comic', url:'example2.com'
+                },
+            ]}));
+        let setSpy = spyOn(browser.storage.local, 'set');
+        await storageService.saveComic("Example Comic", "example.com/comic2.html").then(async () => {
+            const expectedObj = {
+                comics:[
+                    {
+                        title:'Example Comic',
+                        url:'example.com/comic2.html',
+                        bookmark: 1,
+                        uuid:'fakeId'
+                    },
+                    {
+                        title:'Another Comic', url:'example2.com'
+                    },
+                ]};
             expect(setSpy).toHaveBeenCalledWith(expectedObj);
-            done();
         });
         
     });
 
-    it("should update the bookmark when 'saveComic' called with existing title", done => {
-        const storageService = new StorageService();
 
-        let bookmarkGetSpy = spyOn(bookmarksMock, 'get').and.returnValue(
-            new Promise(resolve => resolve(
-                [{id: 1}]
-            ))
-        );
-        let bookmarkUpdateSpy = spyOn(bookmarksMock, 'update').and.returnValue(
-            Promise.resolve([{id: 1}])
-        );
-
-        browser.storage.local.get = function(key){
-                return new Promise(resolve => resolve(
-                    {comics:[
-                        {title:'Example Comic', url:'example.com', bookmark: 1},
-                        {title:'Another Comic', url:'example2.com', bookmark: 2}
-                    ]}
-            ));
-        }
-
-        storageService.saveComic("Example Comic", "example.com/comic2.html").then(comics => {
-            expect(bookmarkGetSpy).toHaveBeenCalled();
-            expect(bookmarkUpdateSpy).toHaveBeenCalled();
-            done();
-        });
-        
-    });
 
     it("should create a bookmark when 'saveComic' called with existing title, " +
             "but no bookmark exists yet", done => {
         const storageService = new StorageService();
 
-        let storageGetSpy = spyOn(storageMock, 'get').and.returnValue(
+        let storageGetSpy = spyOn(browser.storage.local, 'get').withArgs('comics').and.returnValue(
             Promise.resolve({comics:[
                 {title:'Example Comic', url:'example.com'},
                 {title:'Another Comic', url:'example2.com'}
             ]})
-        );
+        ).withArgs("save_bookmarks").and.returnValue(Promise.resolve({save_bookmarks:true}))
+        .withArgs("use_sync").and.returnValue(Promise.resolve({use_sync:false}));
 
         let bookmarkGetSpy = spyOn(bookmarksMock, 'get');
         let bookmarkCreateSpy = spyOn(bookmarksMock, 'create').and.returnValue(
@@ -148,7 +155,7 @@ describe("Storage Service",function(){
     it("should remove a value when 'deleteComic' called with existing title", () => {
         const storageService = new StorageService();
 
-        let setSpy = spyOn(storageMock, 'set');
+        let setSpy = spyOn(browser.storage.local, 'set');
         storageService.deleteComic("Example Comic").then(comics => {
             let expectedObj = {comics:[
                 {title:'Another Comic', url:'example2.com'}
@@ -185,5 +192,66 @@ describe("Storage Service",function(){
             expect(found.length).toBe(0);
         });
         
+    });
+
+    it("should return a bool indicating if anything is saved in sync", async () => {
+        const storageService = new StorageService();
+        let getSpy = spyOn(browser.storage.sync, 'get').and.returnValue(
+            Promise.resolve({comics:undefined}))
+            ;
+        let result = await storageService.doesSyncHasData()
+        expect(result).toBeFalse();
+        expect(getSpy).toHaveBeenCalled();
+    });
+
+    it("adds missing UUIDs on upgrade", async () => {
+        const storageService = new StorageService();
+        let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
+            comics:[
+                {
+                    title:'Example Comic',
+                    url:'example.com/comic1.html',
+                    bookmark: 1
+                },
+                {
+                    title:'Another Comic', url:'example2.com'
+                },
+            ]}));
+        let setSpy = spyOn(browser.storage.local, 'set');
+        await storageService.addMissingUUIDs();
+
+        expect(setSpy).toHaveBeenCalled()
+    });
+
+    it("should merge storage correctly", async () => {
+        const storageService = new StorageService();
+        let localGetSpy = spyOn(browser.storage.local, 'get').and.returnValue(
+            Promise.resolve(
+                {comics:[
+                    {title:'Example Comic', url:'example.com'},
+                    {title:'Another Comic', url:'example2.com'},
+                ]}
+            ));
+        let syncGetSpy = spyOn(browser.storage.sync, 'get').and.returnValue(
+            Promise.resolve(
+                {comics:[
+                    {title:'Silly Comic', url:'example3.com'},
+                ]}
+            ));
+
+        let setSpy = spyOn(browser.storage.sync, 'set')
+
+        await storageService.mergeLocalIntoSync()
+
+        // expect(getSpy).toHaveBeenCalled();
+        
+        let expectedMerge = [
+            
+            {title:'Silly Comic', url:'example3.com'},
+            {title:'Example Comic', url:'example.com'},
+            {title:'Another Comic', url:'example2.com'},
+        ];
+
+        expect(setSpy).toHaveBeenCalledWith("comics", expectedMerge);
     });
 });

@@ -1,7 +1,16 @@
 export default class StorageService {
 
-    getComics(){
-        return browser.storage.local.get('comics').then(
+    async _getStorage() {
+        let useSync = await this.getSyncSetting();
+        if(useSync){
+            return browser.storage.sync;
+        } else {
+            return browser.storage.local;
+        }
+    }
+
+    async getComics(){
+        return (await this._getStorage()).get('comics').then(
             results => results.comics || [],
             error => {
                 console.error(error);
@@ -10,13 +19,13 @@ export default class StorageService {
         );
     }
 
-    saveComic(title, url){
+    async saveComic(title, url){
         if(!title || !url){
             throw new Error('Arguments are empty')
         }
 
         return this.getComics().then(comics => {
-            let newComic = {title, url};
+            let newComic = {title, url, uuid: crypto.randomUUID()};
 
             //check if this comic already exists
             for (let i = 0; i < comics.length; i++){
@@ -83,11 +92,12 @@ export default class StorageService {
                 return comics;
             });
 
-        }).then(comics => {
+        }).then(async comics => {
             if (!comics) {
                 throw new Error("Tried to save blank comics array");
             }
-            browser.storage.local.set({comics})
+            const browserStorage = await this._getStorage();
+            browserStorage.set({comics})
         }
         );        
     }
@@ -105,9 +115,9 @@ export default class StorageService {
             }
 
             //check if this comic already exists
-            for(let i = 0; i < comics.length; i++){
+            for (let i = 0; i < comics.length; i++) {
                 let comic = comics[i];
-                if(comic.title === title){
+                if (comic.title === title) {
                     comics.splice(i, 1);;
                     return comics;
                 }
@@ -116,8 +126,8 @@ export default class StorageService {
             //...and if it doesn't...
             throw new Error(`Tried to delete comic ${title} but no comic with that name!`);
 
-        }).then(comics => 
-            browser.storage.local.set({comics})
+        }).then(async comics => 
+            (await this._getStorage()).set({comics})
         );
         
     }
@@ -136,12 +146,68 @@ export default class StorageService {
         return browser.storage.local.get('save_bookmarks').then(
             results => !!results.save_bookmarks,
             error => {
-                browser.storage.local.set({'save_bookmarks': true});
+                browser.storage.local.set({'save_bookmarks': false});
+                console.log('Bookmark setting missing, defaulting to false');
+            }
+        );
+    }
+
+    getSyncSetting() {
+        return browser.storage.local.get('use_sync').then(
+            results => results.use_sync,
+            error => {
+                browser.storage.local.set({'use_sync': true});
                 console.log('Bookmark setting missing, defaulting to true');
             }
         );
     }
 
+    async doesSyncHasData() {
+        let currentData = await browser.storage.sync.get("comics");
+        return (!!currentData.comics)
+    }
+
+    async copyLocalToSyncStorage() {
+        let results = await browser.storage.local.get("comics")
+        let localData = results["comics"];
+        await browser.storage.sync.set({"comics": localData});
+    }
+
+    async mergeLocalIntoSync() {
+        let localComics = (await browser.storage.local.get("comics"))["comics"];
+        let syncComics = (await browser.storage.sync.get("comics"))["comics"];
+        let newDict = mergeDictionaries(localComics, syncComics)
+
+        await browser.storage.sync.set("comics", newDict);
+    }
+
+    async addMissingUUIDs() {
+        let oldComics = await browser.storage.local.get("comics");
+        for (let comic of oldComics["comics"]) {
+            if (comic.uuid) {
+                continue;
+            }
+
+            comic.uuid = crypto.randomUUID();
+        }
+
+        await browser.storage.local.set("comics", oldComics);
+    }
+
+}
+
+function mergeDictionaries(newData, existingData) {
+    for (let newComic of newData) {
+        let existingComics = existingData.filter(savedComic => savedComic.uuid === newComic.uuid);
+        if (existingComics.length) {
+            // TODO: sort this properly
+            console.warn("Possible clash UNIMPLEMENTED")
+        }
+
+        existingData.push(newComic);
+
+    }
+    return existingData;
 }
 
 function extractHostname(url) {

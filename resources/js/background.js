@@ -43,6 +43,11 @@ function onInstalledActions(details) {
 
     case 'update':
         console.log('User has updated their extension.');
+        
+        if (previousVersion < 0.5){
+          let storageService = new StorageService();
+          storageService.addMissingUUIDs();
+        }
 
         if (previousVersion < 0.4){
           browser.notifications.create('onUpdated', {
