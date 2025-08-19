@@ -71,7 +71,7 @@ describe("Storage Service", function(){
     it("should add a value when 'saveComic' called with new title", async () => {
         const storageService = new StorageService();
 
-        let setSpy = spyOn(browser.storage.local, 'set');
+        let setSpy = spyOn(browser.storage.sync, 'set');
         await storageService.saveComic("New Comic", "zombo.com").then(async () => {
             let expectedObj = {comics:[
                 {title:'Example Comic', url:'example.com'},
@@ -87,7 +87,7 @@ describe("Storage Service", function(){
     it("should replace a value when 'saveComic' called with existing title", async () => {
         const storageService = new StorageService();
         
-        let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
+        let getSpy = spyOn(browser.storage.sync, 'get').and.returnValue(Promise.resolve({
             comics:[
                 {
                     title:'Example Comic',
@@ -98,7 +98,7 @@ describe("Storage Service", function(){
                     title:'Another Comic', url:'example2.com'
                 },
             ]}));
-        let setSpy = spyOn(browser.storage.local, 'set');
+        let setSpy = spyOn(browser.storage.sync, 'set');
         await storageService.saveComic("Example Comic", "example.com/comic2.html").then(async () => {
             const expectedObj = {
                 comics:[
@@ -122,7 +122,7 @@ describe("Storage Service", function(){
             "but no bookmark exists yet", done => {
         const storageService = new StorageService();
 
-        let storageGetSpy = spyOn(browser.storage.local, 'get').withArgs('comics').and.returnValue(
+        let storageGetSpy = spyOn(browser.storage.sync, 'get').withArgs('comics').and.returnValue(
             Promise.resolve({comics:[
                 {title:'Example Comic', url:'example.com'},
                 {title:'Another Comic', url:'example2.com'}
@@ -149,7 +149,7 @@ describe("Storage Service", function(){
     it("should remove a value when 'deleteComic' called with existing title", async () => {
         const storageService = new StorageService();
 
-        let setSpy = spyOn(browser.storage.local, 'set');
+        let setSpy = spyOn(browser.storage.sync, 'set');
         await storageService.deleteComic("Example Comic").then(comics => {
             let expectedObj = {comics:[
                 {title:'Another Comic', url:'example2.com'}

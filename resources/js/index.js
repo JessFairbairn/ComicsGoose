@@ -15,6 +15,8 @@ function loadComicList(){
             return;
         }
 
+        document.getElementById('no-comics-message').style.display = 'none';            
+
         for(let comic of comics){
             let listItem = document.createElement("li");
             let radioButton = document.createElement("input");
@@ -55,3 +57,6 @@ function handleMessage(request, sender, sendResponse) {
   }
   
   browser.runtime.onMessage.addListener(handleMessage);
+
+// Update the comics list on a firefox sync.
+browser.storage.sync.onChanged.addListener(changes => loadComicList());
