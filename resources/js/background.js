@@ -1,3 +1,5 @@
+import StorageService from './services/storage.js'
+
 browser.menus.create({
     id: "click-me",
     title: "View Saved Comics",
@@ -41,7 +43,7 @@ function onInstalledActions(details) {
 
     case 'update':
         console.log('User has updated their extension.');
-        
+
         if (previousVersion < 0.4){
           browser.notifications.create('onUpdated', {
             title: `Comics Goose Updated: ${previousVersionText} - ${currentVersionText}`,

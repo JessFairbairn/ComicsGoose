@@ -1,4 +1,4 @@
-import NameService from "../../resources/js/services/name.js";
+import NameService from "../resources/js/services/name.js";
 describe("Name Service",function(){
     'use strict';
 

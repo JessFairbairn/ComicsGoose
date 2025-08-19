@@ -1,0 +1,23 @@
+{
+  "srcDir": "src",
+  "srcFiles": [],
+  "specDir": ".",
+  "specFiles": [
+    "spec/**/*[sS]pec.?(m)js"
+  ],
+  "helpers": [
+    "spec/helpers/**/*.?(m)js"
+  ],
+  "esmFilenameExtension": ".js",
+  "enableTopLevelAwait": false,
+  "env": {
+    "stopSpecOnExpectationFailure": false,
+    "stopOnSpecFailure": false,
+    "random": true
+  },
+  "listenAddress": "localhost",
+  "hostname": "localhost",
+  "browser": {
+    "name": "headlessFirefox"
+  }
+}
