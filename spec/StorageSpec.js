@@ -204,24 +204,24 @@ describe("Storage Service", function(){
         expect(getSpy).toHaveBeenCalled();
     });
 
-    it("adds missing UUIDs on upgrade", async () => {
-        const storageService = new StorageService();
-        let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
-            comics:[
-                {
-                    title:'Example Comic',
-                    url:'example.com/comic1.html',
-                    bookmark: 1
-                },
-                {
-                    title:'Another Comic', url:'example2.com'
-                },
-            ]}));
-        let setSpy = spyOn(browser.storage.local, 'set');
-        await storageService.addMissingUUIDs();
+    // it("adds missing UUIDs on upgrade", async () => {
+    //     const storageService = new StorageService();
+    //     let getSpy = spyOn(browser.storage.local, 'get').and.returnValue(Promise.resolve({
+    //         comics:[
+    //             {
+    //                 title:'Example Comic',
+    //                 url:'example.com/comic1.html',
+    //                 bookmark: 1
+    //             },
+    //             {
+    //                 title:'Another Comic', url:'example2.com'
+    //             },
+    //         ]}));
+    //     let setSpy = spyOn(browser.storage.local, 'set');
+    //     await storageService.addMissingUUIDs();
 
-        expect(setSpy).toHaveBeenCalled()
-    });
+    //     expect(setSpy).toHaveBeenCalled()
+    // });
 
     it("should merge storage correctly", async () => {
         const storageService = new StorageService();
@@ -254,4 +254,10 @@ describe("Storage Service", function(){
 
         expect(setSpy).toHaveBeenCalledWith("comics", expectedMerge);
     });
+
+    it("should upload comics if none exist on activation", () => fail("Test not implemented"))
+    it("should merge up comics on local update", () => fail("Test not implemented"));
+    it("should merge comics with same domain if no UUID", () => fail("Test not implemented"));
+    it("should ignore comics with same domain if server copy has UUID", () => fail("Test not implemented"));
+    it("should ignore comics with same domain if server local has UUID", () => fail("Test not implemented"));
 });

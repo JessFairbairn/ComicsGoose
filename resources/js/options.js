@@ -34,6 +34,9 @@ export function bookmarks_toggle_callback(event) {
 }
 
 export async function sync_toggle_callback(event) {
+    /**
+     * When Sync toggle is clicked
+     */
     const newSetting = event.target.checked;
     console.debug('Setting "sync" setting to ' + newSetting);
 
