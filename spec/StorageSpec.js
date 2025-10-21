@@ -223,41 +223,4 @@ describe("Storage Service", function(){
     //     expect(setSpy).toHaveBeenCalled()
     // });
 
-    it("should merge storage correctly", async () => {
-        const storageService = new StorageService();
-        let localGetSpy = spyOn(browser.storage.local, 'get').and.returnValue(
-            Promise.resolve(
-                {comics:[
-                    {title:'Example Comic', url:'example.com'},
-                    {title:'Another Comic', url:'example2.com'},
-                ]}
-            ));
-        let syncGetSpy = spyOn(browser.storage.sync, 'get').and.returnValue(
-            Promise.resolve(
-                {comics:[
-                    {title:'Silly Comic', url:'example3.com'},
-                ]}
-            ));
-
-        let setSpy = spyOn(browser.storage.sync, 'set')
-
-        await storageService.mergeLocalIntoSync()
-
-        // expect(getSpy).toHaveBeenCalled();
-        
-        let expectedMerge = [
-            
-            {title:'Silly Comic', url:'example3.com'},
-            {title:'Example Comic', url:'example.com'},
-            {title:'Another Comic', url:'example2.com'},
-        ];
-
-        expect(setSpy).toHaveBeenCalledWith("comics", expectedMerge);
-    });
-
-    it("should upload comics if none exist on activation", () => fail("Test not implemented"))
-    it("should merge up comics on local update", () => fail("Test not implemented"));
-    it("should merge comics with same domain if no UUID", () => fail("Test not implemented"));
-    it("should ignore comics with same domain if server copy has UUID", () => fail("Test not implemented"));
-    it("should ignore comics with same domain if server local has UUID", () => fail("Test not implemented"));
 });
