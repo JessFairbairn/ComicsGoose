@@ -1,4 +1,5 @@
 import StorageService from "../resources/js/services/storage.js";
+import SyncService from "../resources/js/services/sync.js";
 
 
 describe("Storage Service", function(){
@@ -76,15 +77,15 @@ describe("Storage Service", function(){
         const storageService = new StorageService();
 
         let setSpy = spyOn(browser.storage.local, 'set');
-        await storageService.saveComic("New Comic", "zombo.com").then(async () => {
-            let expectedObj = {comics:[
-                {title:'Example Comic', url:'example.com'},
-                {title:'Another Comic', url:'example2.com'},
-                {title:'New Comic', url:'zombo.com', uuid:'fakeId', bookmark: 1},
-            ]};
-            expect(setSpy).toHaveBeenCalledOnceWith(expectedObj);
-            
-        });
+        let syncSpy = spyOn(SyncService.prototype, "mergeUp");
+        await storageService.saveComic("New Comic", "zombo.com");
+        let expectedObj = {comics: [
+            {title:'Example Comic', url:'example.com'},
+            {title:'Another Comic', url:'example2.com'},
+            {title:'New Comic', url:'zombo.com', uuid:'fakeId', bookmark: 1},
+        ]};
+        expect(setSpy).toHaveBeenCalledOnceWith(expectedObj);
+        expect(syncSpy).toHaveBeenCalledOnceWith(expectedObj);
         
     });
 

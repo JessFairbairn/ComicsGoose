@@ -1,3 +1,5 @@
+import SyncService from "./sync.js";
+
 export default class StorageService {
 
     async _getStorage() {
