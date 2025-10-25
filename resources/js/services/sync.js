@@ -1,6 +1,12 @@
 export default class SyncService {
 
-    mergeUp() {
+    /**
+     * Merge comics into sync
+     *
+     * @param {Object[]} comicsDict 
+     */
+    mergeUp(comicsDict) {
+        
         throw new Exception("Not implemented");
     }
 

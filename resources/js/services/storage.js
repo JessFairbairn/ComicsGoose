@@ -1,18 +1,12 @@
 import SyncService from "./sync.js";
 
 export default class StorageService {
-
-    async _getStorage() {
-        let useSync = await this.getSyncSetting();
-        if(useSync){
-            return browser.storage.sync;
-        } else {
-            return browser.storage.local;
-        }
+    constructor() {
+        this.syncService = new SyncService();
     }
 
     async getComics(){
-        return (await this._getStorage()).get('comics').then(
+        return browser.storage.local.get('comics').then(
             results => results.comics || [],
             error => {
                 console.error(error);
@@ -21,7 +15,7 @@ export default class StorageService {
         );
     }
 
-    async saveComic(title, url){
+    async saveComic(title, url) {
         if(!title || !url){
             throw new Error('Arguments are empty')
         }
@@ -98,10 +92,9 @@ export default class StorageService {
             if (!comics) {
                 throw new Error("Tried to save blank comics array");
             }
-            const browserStorage = await this._getStorage();
-            browserStorage.set({comics})
-        }
-        );        
+            await browser.storage.local.set({comics})
+            return comics;
+        }).then(comics => (this.syncService.mergeUp(comics)));        
     }
 
     deleteComic(title){
@@ -129,7 +122,7 @@ export default class StorageService {
             throw new Error(`Tried to delete comic ${title} but no comic with that name!`);
 
         }).then(async comics => 
-            (await this._getStorage()).set({comics})
+            (await browser.storage.local()).set({comics})
         );
         
     }

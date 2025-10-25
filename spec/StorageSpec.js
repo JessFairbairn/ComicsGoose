@@ -85,7 +85,7 @@ describe("Storage Service", function(){
             {title:'New Comic', url:'zombo.com', uuid:'fakeId', bookmark: 1},
         ]};
         expect(setSpy).toHaveBeenCalledOnceWith(expectedObj);
-        expect(syncSpy).toHaveBeenCalledOnceWith(expectedObj);
+        expect(syncSpy).toHaveBeenCalledOnceWith(expectedObj.comics);
         
     });
 
@@ -105,6 +105,7 @@ describe("Storage Service", function(){
                 },
             ]}));
         let setSpy = spyOn(browser.storage.local, 'set');
+        let syncSpy = spyOn(SyncService.prototype, "mergeUp");
         await storageService.saveComic("Example Comic", "example.com/comic2.html").then(async () => {
             const expectedObj = {
                 comics:[
@@ -119,6 +120,8 @@ describe("Storage Service", function(){
                     },
                 ]};
             expect(setSpy).toHaveBeenCalledWith(expectedObj);
+            
+            expect(syncSpy).toHaveBeenCalledOnceWith(expectedObj.comics);
         });
         
     });
